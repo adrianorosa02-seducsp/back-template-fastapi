@@ -13,7 +13,7 @@ class UserPublic(BaseModel):
     id: int
     username: str
     email: EmailStr
-    password: str
+    #password: str
 
 # Como o dado fica no Banco de Dados
 class UserDB(UserSchema):

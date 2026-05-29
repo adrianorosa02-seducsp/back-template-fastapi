@@ -49,17 +49,22 @@
 <body>
 
 <div class="login-container">
-    <h2>Login</h2>
+    <h2>Cadastro de Usuário</h2>
     <form id="loginForm">
+        <!-- Campo de Nome de Usuário adicionado para bater com o Schema -->
         <div class="form-group">
-            <label for="username">E-mail</label>
-            <input type="email" id="username" name="username" required placeholder="seu@email.com">
+            <label for="username">Nome de Usuário</label>
+            <input type="text" id="username" name="username" required placeholder="Ex: joao_silva">
+        </div>
+        <div class="form-group">
+            <label for="email">E-mail</label>
+            <input type="email" id="email" name="email" required placeholder="seu@email.com">
         </div>
         <div class="form-group">
             <label for="password">Senha</label>
             <input type="password" id="password" name="password" required placeholder="********">
         </div>
-        <button type="submit" id="btnSubmit">Entrar</button>
+        <button type="submit" id="btnSubmit">Criar Usuário</button>
     </form>
     <div id="message"></div>
 </div>
@@ -67,7 +72,9 @@
 <script>
     const loginForm = document.getElementById('loginForm');
     const messageDiv = document.getElementById('message');
-    const webhookUrl = 'https://n8n.inetz.com.br/webhook-test/b0c4e44e-0332-4d73-a545-a3144fe4a33a';
+    
+    // Substitua 'SEU_DOMINIO' pela URL base do seu servidor
+    const apiUrl = 'http://127.0.0.1:8000/users/';
 
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -79,7 +86,7 @@
         messageDiv.style.color = '#666';
 
         try {
-            const response = await fetch(webhookUrl, {
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -88,11 +95,17 @@
             });
 
             if (response.ok) {
-                messageDiv.innerText = 'Sucesso! Dados enviados ao n8n.';
+                messageDiv.innerText = 'Sucesso! Usuário criado.';
                 messageDiv.style.color = 'green';
                 loginForm.reset();
             } else {
-                messageDiv.innerText = 'Erro ao enviar dados.';
+                const errorData = await response.json();
+                let errorMsg = errorData.detail;
+                if (Array.isArray(errorMsg)) {
+                    // Erros de validação do FastAPI (422) vêm como array
+                    errorMsg = errorMsg.map(err => `${err.loc[err.loc.length - 1]}: ${err.msg}`).join(', ');
+                }
+                messageDiv.innerText = 'Erro: ' + (errorMsg || 'Falha na requisição');
                 messageDiv.style.color = 'red';
             }
         } catch (error) {

@@ -3,6 +3,7 @@ from http import HTTPStatus
 from typing import List
 
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -11,6 +12,14 @@ from fast_zero.models import Aluno, User
 from fast_zero.schemas import AlunoPublic, AlunoSchema, UserPublic, UserSchema
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # Comando para criar as tabelas ao subir a aplicação
